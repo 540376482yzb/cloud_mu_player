@@ -9,4 +9,10 @@ MVP feature for managing media content, upload and download media. Have the bili
 
 ## Road map
 
-* Music Service ( upload, retrive download link of media content)
+* Music Service ( upload, get download link of media content)
+
+## Logs/bugs
+
+* fix: permission error with Firebase.getSignUrl. Solution is to add token creator role to default gcp account under IAM.
+* fix: unable to write to remote POSTGRES Database. Cloud functions does not allow any outbound network request to other service provider in free tier.
+* fix: url length exceed knex.string limitation. Solution is to change from string to text in schema.
