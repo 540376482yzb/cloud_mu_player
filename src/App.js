@@ -1,32 +1,30 @@
-import React, { useState } from "react";
-// Import React FilePond
-import { FilePond, registerPlugin } from "react-filepond";
-
-// Import FilePond styles
-import "filepond/dist/filepond.min.css";
-
-// Import the Image EXIF Orientation and Image Preview plugins
-// Note: These need to be installed separately
-// `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation --save`
-import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-
-// Register the plugins
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+import React from "react";
+import { Provider } from 'react-redux';
+import './module/music'
+import { store } from './root/store'
+import {
+  BrowserRouter as Router,
+  Switch
+} from "react-router-dom";
+import { makeRoute } from './root/route'
+import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
-  const [files, setFiles] = useState([]);
   return (
-    <div className="App">
-      <FilePond
-        files={files}
-        allowMultiple={true}
-        onupdatefiles={setFiles}
-        labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-        server="https://us-central1-cloud-mu-player.cloudfunctions.net/app/api/music/upload"
-      />
-    </div>
+    <Provider store={store}>
+      <main className="pt-4" style={{
+        backgroundColor: '#F6F7F9',
+        width: '100vw',
+        minHeight: '100vh'
+      }}>
+        <Router>
+          <Switch>
+            {makeRoute()}
+          </Switch>
+        </Router>
+      </main>
+
+    </Provider>
   );
 }
 

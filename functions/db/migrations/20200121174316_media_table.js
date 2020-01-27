@@ -5,6 +5,7 @@ exports.up = function (knex) {
       table.increments('id');
       table.text('title').notNullable();
       table.text('src').notNullable();
+      table.string('type').notNullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
     })

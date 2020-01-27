@@ -1,5 +1,6 @@
 const knex = require('../../db/knex');
 const admin = require('firebase-admin');
+const functions = require('firebase-functions');
 admin.initializeApp();
 const bucket = admin.storage().bucket();
 const EXPIRED_DATE = '03-09-2491'
@@ -10,7 +11,10 @@ class MusicService {
   static async addMusic(req, res, next) {
     return MusicService._uploadToStorage(req.files, bucket)
       .then(concatFiles => knex('music_item').insert(concatFiles))
-      .then(() => res.send('add music success'))
+      .then(() => {
+        MusicService.sendUploadComplete();
+        return res.send('ok')
+      })
       .catch(err => res.send(err))
   }
 
@@ -28,14 +32,14 @@ Object.assign(MusicService, {
       const destination = path.join('music', file.originalname)
       await bucket.upload(file.path, {
         destination,
-        metadata: { metadata: { contentType: file.mimeType } }
+        metadata: { metadata: { contentType: file.mimetype } }
       })
-      console.log('upload completed')
+      console.log('upload completed', file)
       const [src] = await bucket.file(destination).getSignedUrl({ action: 'read', expires: EXPIRED_DATE })
         .catch(MusicService.andThrow)
-      console.log('get signed url', src)
       return {
         title: MusicService.getImageName(file.originalname),
+        type: file.mimetype,
         src
       }
     }))
@@ -44,7 +48,8 @@ Object.assign(MusicService, {
     console.log(error)
     throw error;
   },
-  getImageName: (fullfilename) => fullfilename.split('.')[0]
+  getImageName: (fullfilename) => fullfilename.split('.')[0],
+  sendUploadComplete: (ts = Date.now()) => admin.database().ref('uploadAt').set(ts)
 })
 
 module.exports = { MusicService }
